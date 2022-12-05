@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Day01a
+      Day02
   other-modules:
       Paths_Advent2022
   hs-source-dirs:
