@@ -4,7 +4,7 @@ import Text.Read (readEither)
 import Data.List (sort)
 
 dataFile01 :: FilePath 
-dataFile01 = "/Users/Stefano.Paluello/Projects/haskell/Advent2022/01_data.txt"
+dataFile01 = "data/01_data.txt"
 
 -- split the list of calories carried by one Elf
 splitCalories :: [String] -> [[String]]
