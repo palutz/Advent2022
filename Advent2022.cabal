@@ -27,6 +27,7 @@ library
   exposed-modules:
       Day01a
       Day02
+      Day02test
   other-modules:
       Paths_Advent2022
   hs-source-dirs:
