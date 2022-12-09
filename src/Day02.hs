@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+-- {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Day02 where
 
 dataFile02 :: FilePath
@@ -13,6 +13,20 @@ data Hand = Rock | Paper| Scissors
 data Result = Win | Draw | Lose
               deriving (Show, Eq)
 
+data HandsResult = HandsResult {
+  otherP :: Hand,
+  myHand :: Hand,
+  outcome :: Result
+} deriving (Show)
+
+data Parts = Part1 | Part2 
+            deriving (Show)
+
+data HandParts  =
+  HandPart1 (Hand, Hand)
+  | HandPart2 (Hand, Result)
+  deriving (Show)
+
 mapInpToHand :: String -> Hand 
 mapInpToHand "A" =  Rock
 mapInpToHand "B" = Paper
@@ -25,7 +39,6 @@ mapInpToResult :: String -> Result
 mapInpToResult "X" = Lose 
 mapInpToResult "Y" = Draw
 mapInpToResult "Z" = Win
-
 
 decryptHand :: (String, String) -> (Hand, Hand)
 decryptHand (e1, e2) = (decInput, decOut)
@@ -45,12 +58,6 @@ splitIn2 s = (w1 wordS, w2 wordS)
                 w2 :: [String] -> String
                 w2 = (!! 1)
 
-data HandsResult = HandsResult {
-  otherP :: Hand,
-  myHand :: Hand,
-  outcome :: Result
-}
-
 allHandsRSP :: [HandsResult] -- all possible results for Rock Scissors Paper
 allHandsRSP = 
     [
@@ -64,7 +71,6 @@ allHandsRSP =
       HandsResult Scissors Scissors Draw,
       HandsResult Scissors Rock Win
     ]
-
 
 resultHand :: (HandsResult -> Bool) -> [HandsResult] -> HandsResult
 resultHand predicate = head . filter predicate
@@ -80,17 +86,16 @@ valueHand Rock = 1
 valueHand Paper = 2
 valueHand Scissors = 3
 
+-- find the handresult record for the game with the 2 hands as paramenter
 findHandPart1 :: (Hand, Hand) -> HandsResult -> Bool
 findHandPart1 (h1, h2) x = (h1 == otherP x && h2 == myHand x)
 
+-- find the handresult record for the game with the 1st hands and the outcome as paramenter
 findHandPart2 :: (Hand, Result) -> HandsResult -> Bool 
 findHandPart2 (h1, res) x = (h1 == otherP x && res == outcome x)
 
-data HandParts  =
-  HandPart1 (Hand, Hand)
-  | HandPart2 (Hand, Result)
-
 winLoseRSP :: HandParts -> HandsResult
+-- calculate hand for the first part. Just checking with hand win or not
 winLoseRSP (HandPart1 (h1, h2)) = resultHand fp1 allHandsRSP
                   where fp1 = findHandPart1 (h1, h2)
 -- calculate Hand for the second part in which we need to manage the outcome of the hand in another way ...
@@ -115,24 +120,21 @@ calculateHand (HandPart2 (h1, r))  f = resultToInt (outcome handRes2) + valueHan
 calculatePart :: HandParts -> Int
 calculatePart hp = calculateHand hp winLoseRSP
 
-totHands :: [String] -> Int
-totHands = sum . map (\x -> calculatePart (HandPart1 $ mapped x))
+totHands :: Parts ->[String] -> Int 
+totHands part = sum . map (calculatePart . decryptPart)
                 where 
-                  mapped :: String -> (Hand, Hand)
-                  mapped = decryptHand . splitIn2 
-
-totHands2 :: [String] -> Int 
-totHands2 = sum . map (\x -> calculatePart (HandPart2 $ mapped x))
-                where 
-                  mapped :: String -> (Hand, Result)
-                  mapped = decryptHand2 . splitIn2 
+                  decryptPart :: String -> HandParts
+                  decryptPart s = 
+                    case part of 
+                      Part1 -> HandPart1 (decryptHand . splitIn2 $ s)
+                      Part2 -> HandPart2 (decryptHand2 . splitIn2 $ s)
 
 dataTest :: FilePath -> IO () 
 dataTest fp = 
     do
       contents <- readFile fp 
-      let ls = totHands $ lines contents
-      let ls2 = totHands2 $ lines contents
+      let ls  = totHands Part1 $ lines contents
+      let ls2 = totHands Part2 $ lines contents
       print ("First part= " <> show ls <> ". Second part= " <> show ls2)
 
 -- tData :: [(String,String)]
