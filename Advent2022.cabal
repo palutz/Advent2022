@@ -27,6 +27,7 @@ library
   exposed-modules:
       Day01a
       Day02
+      Day03
   other-modules:
       Paths_Advent2022
   hs-source-dirs:
@@ -34,6 +35,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , containers >=0.5.9
   default-language: Haskell2010
 
 executable Advent2022-exe
@@ -46,6 +48,7 @@ executable Advent2022-exe
   build-depends:
       Advent2022
     , base >=4.7 && <5
+    , containers >=0.5.9
   default-language: Haskell2010
 
 test-suite Advent2022-test
@@ -59,4 +62,5 @@ test-suite Advent2022-test
   build-depends:
       Advent2022
     , base >=4.7 && <5
+    , containers >=0.5.9
   default-language: Haskell2010
