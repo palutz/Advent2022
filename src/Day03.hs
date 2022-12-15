@@ -5,8 +5,10 @@ import Data.Containers.ListUtils(nubOrd)
 dataFile03 :: FilePath
 dataFile03 = "data/03_day03.txt"
 
-test1 :: String
-test1 = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw"
+data Workflow = Part1WF | Part2WF
+
+test03 :: String
+test03 = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw"
 
 lowerL ::[(Char, Int)]
 lowerL = zip ['a'..'z'] [1..26]
@@ -33,13 +35,40 @@ findCommon :: (String, String) -> [Char]
 findCommon (s1, s2) = nubOrd $            -- snd the nubOrd will remove the duplicated elem in the list
                 foldr (\a xs -> if a `elem` s1 then a:xs else xs) [] s2 -- first the fold will return a list of all the elements in common between 2 lists
 
-day3 :: FilePath -> IO ()
-day3 fData = 
+splitIn3 :: [String] -> [(String, String, String)]
+splitIn3 [] = [] 
+splitIn3 [x] = [(x, "", "")]
+splitIn3 [x1,x2] = [(x1,x2, "")]
+splitIn3 (x1:x2:x3:xs) = (x1,x2,x3) : splitIn3 xs
+
+--part2 Workflow
+part2WF :: String -> Int 
+part2WF content = 
+    let rows = lines content
+        tuples =splitIn3 rows -- [String] -> [(String, String, String)]
+        allComm = concatMap (\(t1,t2,t3) -> findCommon(t1, findCommon(t2, t3))) tuples
+    in 
+        sum $ map (priorValue allLetters) allComm
+
+-- part1 WorkFlow
+part1WF :: String -> Int 
+part1WF content = 
+    let rows = lines content
+        allComm = concatMap (findCommon . splitString) rows -- split, find common and putting all duplicated chars together in one string, from [[]Char]] to [Char]
+    in 
+        sum $ map (priorValue allLetters) allComm
+
+day3Part1 :: FilePath -> IO() 
+day3Part1 = day3 Part1WF
+
+day3Part2 :: FilePath -> IO() 
+day3Part2 = day3 Part2WF
+
+day3 :: Workflow -> FilePath -> IO ()
+day3 wf fData = 
   do 
     content <- readFile fData
-    let rows = lines content
-    let comms = map (findCommon . splitString) rows
-    let allComm = concat comms -- from [String] to a String (or [Char])
-    let rs = map (priorValue allLetters) allComm
-    print (sum rs) 
+    case wf of 
+      Part1WF -> print $ part1WF content
+      Part2WF -> print $ part2WF content
     
