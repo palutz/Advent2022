@@ -28,6 +28,7 @@ library
       Day01a
       Day02
       Day03
+      Day04
   other-modules:
       Paths_Advent2022
   hs-source-dirs:
